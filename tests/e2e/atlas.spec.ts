@@ -132,6 +132,52 @@ test.describe("desktop atlas", () => {
   });
 });
 
+test.describe("map without WebGL", () => {
+  test.skip(({ isMobile }) => isMobile, "desktop layout");
+
+  test("falls back to the SVG map when the browser has no WebGL", async ({ page }) => {
+    // Simulate a browser without WebGL (hardware acceleration off, blocklisted GPU…).
+    await page.addInitScript(() => {
+      const original = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, type: string, ...args: unknown[]) {
+        if (/webgl/i.test(type)) return null;
+        return (original as (...a: unknown[]) => unknown).call(this, type, ...args);
+      } as typeof original;
+    });
+    await page.goto("/");
+    await expect(page.getByTestId("map")).toHaveAttribute("data-renderer", "svg");
+    await expect(page.getByTestId("svg-notice")).toContainText("WebGL");
+    await expect(page.getByText("La mappa non può essere visualizzata")).toHaveCount(0);
+    await expect(page.locator("[data-testid=svg-map] path[data-iso]").first()).toBeAttached();
+    expect(await page.locator("[data-testid^=svg-marker-]").count()).toBeGreaterThan(20);
+    // The detailed online basemap needs WebGL: the option is disabled and explained.
+    await expect(page.getByRole("radio", { name: /OpenFreeMap/ })).toBeDisabled();
+  });
+
+  test("SVG map supports selection, footprints, zoom and keyboard", async ({ page }) => {
+    await page.goto("/?renderer=svg");
+    await expect(page.getByTestId("map")).toHaveAttribute("data-renderer", "svg");
+    await page.getByTestId("svg-marker-great-zimbabwe").click();
+    await expect(page.getByTestId("event-detail").getByRole("heading", { name: "Grande Zimbabwe" })).toBeVisible();
+
+    await page.goto("/?renderer=svg&sel=partition-of-india");
+    await expect(page.locator("[data-testid=svg-map] path[data-footprint=true]").first()).toBeAttached();
+
+    const world = page.getByTestId("svg-world");
+    const before = await world.getAttribute("transform");
+    await page.getByRole("button", { name: "Ingrandisci" }).click();
+    await expect.poll(() => world.getAttribute("transform")).not.toBe(before);
+    const map = page.getByRole("group", { name: /modalità compatibile/ });
+    await map.focus();
+    const beforeKey = await world.getAttribute("transform");
+    await page.keyboard.press("ArrowLeft");
+    await expect.poll(() => world.getAttribute("transform")).not.toBe(beforeKey);
+    await page.getByTestId("svg-marker-partition-of-india").first().focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByTestId("event-detail").getByRole("heading", { name: "La Partizione dell'India" })).toBeVisible();
+  });
+});
+
 test.describe("mobile atlas", () => {
   test.skip(({ isMobile }) => !isMobile, "mobile layout");
 

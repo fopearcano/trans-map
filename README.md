@@ -42,7 +42,7 @@ npm run check
 npm run test:e2e
 ```
 
-`npm run check` esegue type-check, validazione del dataset e test unitari (Vitest, 58 test). `npm run test:e2e` avvia il server di produzione (serve una `npm run build` precedente) ed esegue 15 test Playwright su desktop, mobile e API. Se il progetto usa un Chromium già installato altrove, impostare `PW_CHROMIUM_PATH`.
+`npm run check` esegue type-check, validazione del dataset e test unitari (Vitest, 58 test). `npm run test:e2e` avvia il server di produzione (serve una `npm run build` precedente) ed esegue 17 test Playwright su desktop, mobile, API e browser senza WebGL. Se il progetto usa un Chromium già installato altrove, impostare `PW_CHROMIUM_PATH`.
 
 Altri comandi:
 
@@ -59,6 +59,7 @@ Altri comandi:
 ## Che cosa funziona (stato reale)
 
 ### Fase 1 — Atlante interattivo ✅
+- **Mappa che funziona in ogni browser**: con WebGL usa MapLibre GL JS; se WebGL manca (accelerazione hardware disattivata, GPU in blocklist, desktop remoti, browser con protezioni anti-fingerprinting) o il contesto grafico viene perso, passa automaticamente a un renderer **SVG** con le stesse funzioni essenziali (selezione, confronto, aree di impatto, dimensioni per metrica, zoom/pan con mouse, touch, rotella e tastiera) e un avviso esplicito. Il renderer SVG si può forzare con `?renderer=svg`.
 - Mappa mondiale vettoriale (MapLibre GL JS) con pan/zoom, cluster dinamici, simboli distinti per famiglia disciplinare (forma **e** colore, palette verificata per il daltonismo), simboli vuoti per localizzazioni approssimate o regionali, eventi con più luoghi collegati da linee, aree di impatto per Stati, vista globale e regionale.
 - Dimensione dei simboli **solo su richiesta** e solo per la metrica scelta (area proporzionale o ordini di grandezza); senza metrica i simboli sono uniformi.
 - Linea del tempo su scala logaritmica del tempo profondo (da 3,3 milioni di anni fa a oggi) con istogramma, doppio cursore e modalità: tutta la storia, periodo (numerico, non eurocentrico), secolo (a.C./d.C.), anno, intervallo. Nessun anno zero.
@@ -99,6 +100,10 @@ Esportazione di mappe e confronti, collezioni personali e percorsi di apprendime
 
 ---
 
+### Risoluzione dei problemi
+- **«Modalità compatibile» sulla mappa**: il browser non offre WebGL. La mappa resta utilizzabile in SVG; per la vista completa (cluster, base dettagliata online) attivare l'accelerazione hardware (Chrome/Edge: *Impostazioni → Sistema → Usa l'accelerazione grafica*; Firefox: *Impostazioni → Prestazioni*) e verificare su `chrome://gpu` che WebGL sia «Hardware accelerated».
+- **Il dev server ricarica la pagina in continuo** («HMR hash mismatch»): la cache di sviluppo di Turbopack è corrotta (ad esempio dopo un'interruzione forzata). Fermare il server, cancellare `.next/dev` e riavviare `npm run dev`.
+
 ## Architettura
 
 ```
@@ -110,7 +115,7 @@ src/
     sources/   Adattatori per fonti esterne + client HTTP resiliente
     repository.ts  Interfaccia EventRepository (implementazione SQLite)
   app/         Next.js App Router: atlante (/), /analisi, /metodo, /eventi/[id], API /api/*
-  components/  UI: atlas (mappa, timeline, filtri, elenco, ricerca), event, compare, horizon, analytics, charts
+  components/  UI: atlas (mappa WebGL + fallback SVG, timeline, filtri, elenco, ricerca), event, compare, horizon, analytics, charts
   i18n/        Dizionari IT/EN
 data/seed/     Dataset curato (TypeScript tipizzato e validato): eventi, fonti, luoghi, tag, relazioni, confronti
 drizzle/       Migrazioni SQL

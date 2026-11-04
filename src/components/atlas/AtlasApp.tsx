@@ -17,7 +17,7 @@ import { EventPanel } from "@/components/event/EventPanel";
 import { HorizonPanel, type SeedMode } from "@/components/horizon/HorizonPanel";
 import { EventList } from "./EventList";
 import { FilterPanel, type FilterState } from "./FilterPanel";
-import { MapView, type Basemap } from "./MapView";
+import { MapView, type MapRenderer } from "./MapView";
 import { SearchBox } from "./SearchBox";
 import { Timeline } from "./Timeline";
 
@@ -68,6 +68,7 @@ export function AtlasApp({ atlas, relations, tags, initial }: { atlas: AtlasEven
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [focusRequest, setFocusRequest] = useState<{ id: string; nonce: number } | null>(initial.sel ? { id: initial.sel, nonce: 0 } : null);
   const [basemapError, setBasemapError] = useState(false);
+  const [mapRenderer, setMapRenderer] = useState<MapRenderer | null>(null);
 
   useEffect(() => {
     setTheme(document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark");
@@ -238,6 +239,7 @@ export function AtlasApp({ atlas, relations, tags, initial }: { atlas: AtlasEven
       total={atlas.length}
       unlocated={filtered.unlocated.length}
       basemapError={basemapError}
+      onlineBasemapAvailable={mapRenderer !== "svg"}
     />
   );
   const eventList = <EventList events={filtered.events} selectedId={selectedId} compareIds={compareIds} onSelect={(id) => selectEvent(id, { focus: true })} onToggleCompare={toggleCompare} />;
@@ -340,6 +342,10 @@ export function AtlasApp({ atlas, relations, tags, initial }: { atlas: AtlasEven
             theme={theme}
             focusRequest={focusRequest}
             onSelect={(id) => selectEvent(id)}
+            onRendererChange={(r) => {
+              setMapRenderer(r);
+              if (r === "svg") setFilters((f) => (f.basemap === "online" ? { ...f, basemap: "local" } : f));
+            }}
             onBasemapError={() => {
               setBasemapError(true);
               setFilters((f) => ({ ...f, basemap: "local" }));

@@ -33,6 +33,7 @@ export function FilterPanel({
   total,
   unlocated,
   basemapError,
+  onlineBasemapAvailable = true,
 }: {
   state: FilterState;
   onChange: (patch: Partial<FilterState>) => void;
@@ -42,6 +43,7 @@ export function FilterPanel({
   total: number;
   unlocated: number;
   basemapError: boolean;
+  onlineBasemapAvailable?: boolean;
 }) {
   const { t, locale, fmt } = useI18n();
   const metrics = SIZABLE_METRICS.filter((m) => availableMetrics.includes(m));
@@ -173,10 +175,18 @@ export function FilterPanel({
           <p id="basemap-label" className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted">{t.filters.basemap}</p>
           {(["local", "online"] as const).map((b) => (
             <label key={b} className="flex cursor-pointer items-center gap-2 text-xs text-ink-2">
-              <input type="radio" name="basemap" checked={state.basemap === b} onChange={() => onChange({ basemap: b })} className="accent-[var(--accent)]" />
+              <input
+                type="radio"
+                name="basemap"
+                checked={state.basemap === b}
+                disabled={b === "online" && !onlineBasemapAvailable}
+                onChange={() => onChange({ basemap: b })}
+                className="accent-[var(--accent)]"
+              />
               {b === "local" ? t.filters.basemapLocal : t.filters.basemapOnline}
             </label>
           ))}
+          {!onlineBasemapAvailable && <p className="mt-1 text-xs text-muted">{t.filters.basemapNeedsWebgl}</p>}
           {basemapError && (
             <p role="alert" className="mt-1 text-xs" style={{ color: "var(--status-serious)" }}>
               {t.filters.basemapError}
