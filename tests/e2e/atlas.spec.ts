@@ -34,6 +34,35 @@ test.describe("desktop atlas", () => {
     await expect(page.getByTestId("list-item-vajont-1963")).toHaveCount(0);
   });
 
+  test("legend starts compact, never hides markers and remembers the user's choice", async ({ page }) => {
+    await page.goto("/");
+    await waitForMap(page);
+    const toggle = page.getByTestId("map-legend-toggle");
+    await expect(toggle).toBeVisible();
+    await expect(page.getByTestId("map-legend")).toHaveCount(0);
+    // No marker in the initial view lies under the compact legend.
+    const box = (await toggle.boundingBox())!;
+    const covered = await page.evaluate((b) => {
+      const map = (window as unknown as { __TRANSMAP_MAP__: { project(ll: [number, number]): { x: number; y: number }; getContainer(): HTMLElement; querySourceFeatures(s: string): { geometry: { coordinates: [number, number] } }[] } }).__TRANSMAP_MAP__;
+      const origin = map.getContainer().getBoundingClientRect();
+      return map
+        .querySourceFeatures("tm-events")
+        .map((f) => map.project(f.geometry.coordinates))
+        .filter((p) => {
+          const x = p.x + origin.left;
+          const y = p.y + origin.top;
+          return x >= b.x - 8 && x <= b.x + b.width + 8 && y >= b.y - 8 && y <= b.y + b.height + 8;
+        }).length;
+    }, box);
+    expect(covered).toBe(0);
+    await toggle.click();
+    await expect(page.getByTestId("map-legend")).toContainText("Saperi, scienze e tecniche");
+    await page.reload();
+    await expect(page.getByTestId("map-legend")).toBeVisible();
+    await page.getByRole("button", { name: "Nascondi la legenda della mappa" }).click();
+    await expect(page.getByTestId("map-legend-toggle")).toBeVisible();
+  });
+
   test("keeps events without coordinates accessible in the list", async ({ page }) => {
     await page.goto("/");
     await page.getByTestId("tab-list").click();
@@ -157,8 +186,9 @@ test.describe("map without WebGL", () => {
   test("SVG map supports selection, footprints, zoom and keyboard", async ({ page }) => {
     await page.goto("/?renderer=svg");
     await expect(page.getByTestId("map")).toHaveAttribute("data-renderer", "svg");
-    await page.getByTestId("svg-marker-great-zimbabwe").click();
-    await expect(page.getByTestId("event-detail").getByRole("heading", { name: "Grande Zimbabwe" })).toBeVisible();
+    // Caral (Peru) used to sit under the expanded legend in the initial view.
+    await page.getByTestId("svg-marker-caral").click();
+    await expect(page.getByTestId("event-detail").getByRole("heading", { name: "Caral, città della valle del Supe" })).toBeVisible();
 
     await page.goto("/?renderer=svg&sel=partition-of-india");
     await expect(page.locator("[data-testid=svg-map] path[data-footprint=true]").first()).toBeAttached();
