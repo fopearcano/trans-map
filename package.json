@@ -1,0 +1,53 @@
+{
+  "name": "trans-map",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TRANS-MAP — The Atlas of Human Significance. Atlante interattivo per esplorare eventi storici, scientifici e culturali e confrontarne le proporzioni.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "^0.45.4",
+    "echarts": "^6.1.0",
+    "maplibre-gl": "^5.24.0",
+    "next": "^16.4.5",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "topojson-client": "^3.1.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/postcss": "^4.3.4",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/topojson-client": "^3.1.5",
+    "drizzle-kit": "^0.31.11",
+    "tailwindcss": "^4.3.4",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^5.1.0",
+    "world-atlas": "^2.0.2"
+  },
+  "scripts": {
+    "dev": "npm run db:setup && next dev",
+    "build": "npm run db:setup && next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx scripts/db-migrate.ts",
+    "db:seed": "tsx scripts/db-seed.ts",
+    "db:setup": "tsx scripts/db-migrate.ts && tsx scripts/db-seed.ts",
+    "data:validate": "tsx scripts/validate-data.ts",
+    "import:wikidata": "tsx scripts/import-wikidata.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "check": "npm run typecheck && npm run data:validate && npm run test"
+  }
+}
