@@ -30,7 +30,9 @@ const it = {
     filters: "Filtri",
     list: "Elenco",
     timeline: "Linea del tempo",
+    timelineShort: "Tempo",
     horizon: "Oltre l'orizzonte",
+    horizonShort: "Orizzonte",
     compare: "Confronta",
     theme: "Tema",
     themeDark: "Scuro",
@@ -344,6 +346,8 @@ const it = {
     logScale: "Scala logaritmica",
     footprints: "Aree di impatto",
     footprintsNote: "Eventi con un'area di impatto documentata (per Stati attuali o globale).",
+    global: "globale",
+    states: "{n} Stati attuali",
   },
   method: {
     title: "Metodo, fonti e limiti",
@@ -373,7 +377,7 @@ const en: Dictionary = {
   },
   nav: { atlas: "Atlas", analytics: "Analytics", method: "Method & sources", skip: "Skip to main content", eventList: "Skip to event list" },
   search: { label: "Search events, places, themes", placeholder: "Search: Vajont, printing, cholera, 1975…", noResults: "No results", results: "{n} results", clear: "Clear search" },
-  toolbar: { filters: "Filters", list: "List", timeline: "Timeline", horizon: "Beyond your horizon", compare: "Compare", theme: "Theme", themeDark: "Dark", themeLight: "Light", language: "Language", close: "Close" },
+  toolbar: { filters: "Filters", list: "List", timeline: "Timeline", timelineShort: "Time", horizon: "Beyond your horizon", horizonShort: "Horizon", compare: "Compare", theme: "Theme", themeDark: "Dark", themeLight: "Light", language: "Language", close: "Close" },
   categories: {
     "history-geopolitics": "History & geopolitics",
     "science-mathematics": "Science & mathematics",
@@ -654,6 +658,8 @@ const en: Dictionary = {
     logScale: "Logarithmic scale",
     footprints: "Impact areas",
     footprintsNote: "Events with a documented impact area (by present-day state or global).",
+    global: "global",
+    states: "{n} present-day states",
   },
   method: { title: "Method, sources and limits" },
   common: {

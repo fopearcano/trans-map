@@ -69,9 +69,9 @@ export class SqliteEventRepository implements EventRepository {
   /** Reloads automatically when the database file changes (e.g. after a re-seed). */
   private load(): Snapshot {
     if (!fs.existsSync(this.file)) throw new DatabaseNotReadyError(this.file);
-    const mtimeMs = Math.max(fs.statSync(this.file).mtimeMs, fs.existsSync(`${this.file}-wal`) ? fs.statSync(`${this.file}-wal`).mtimeMs : 0);
+    const mtimeMs = fs.statSync(this.file).mtimeMs;
     if (this.snapshot && this.snapshot.mtimeMs === mtimeMs) return this.snapshot;
-    const { db, sqlite } = openDatabase(this.file);
+    const { db, sqlite } = openDatabase(this.file, { readonly: true });
     try {
       const { origins, ...dataset } = loadDataset(db);
       this.snapshot = {

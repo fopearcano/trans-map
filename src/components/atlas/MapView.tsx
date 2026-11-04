@@ -514,7 +514,7 @@ export function MapView(props: MapViewProps) {
     const ev = props.events.find((e) => e.id === props.focusRequest!.id);
     if (!ev || ev.points.length === 0) return;
     if (ev.points.length === 1) {
-      map.flyTo({ center: [ev.points[0]!.lon, ev.points[0]!.lat], zoom: Math.max(map.getZoom(), 4), essential: true, duration: 900 });
+      map.flyTo({ center: [ev.points[0]!.lon, ev.points[0]!.lat], zoom: Math.max(map.getZoom(), 4), essential: false, duration: 900 });
     } else {
       const lons = ev.points.map((p) => p.lon);
       const lats = ev.points.map((p) => p.lat);
@@ -550,6 +550,10 @@ export function MapView(props: MapViewProps) {
 function MapLegend({ sizeLabel }: { sizeLabel: string | null }) {
   const { t, fmt } = useI18n();
   const [open, setOpen] = useState(true);
+  // Collapsed by default on small screens, where the map needs the space.
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 767px)").matches) setOpen(false);
+  }, []);
   return (
     <div className="absolute bottom-8 left-2 z-10 max-w-[260px] rounded-md border border-line bg-surface/90 p-2 text-xs text-ink-2 backdrop-blur-sm">
       <button type="button" className="flex w-full items-center justify-between gap-2 font-medium text-ink" aria-expanded={open} onClick={() => setOpen((o) => !o)}>

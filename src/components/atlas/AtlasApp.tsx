@@ -255,10 +255,10 @@ export function AtlasApp({ atlas, relations, tags, initial }: { atlas: AtlasEven
       {/* ——— Top bar ——— */}
       <header className="z-30 flex h-14 shrink-0 items-center gap-2 border-b border-line bg-surface px-2 md:gap-3 md:px-3">
         <Link href="/" className="flex shrink-0 items-baseline gap-2" aria-label="TRANS-MAP">
-          <span className="text-sm font-bold tracking-[0.18em] text-ink">TRANS-MAP</span>
+          <span className="text-xs font-bold tracking-[0.12em] text-ink sm:text-sm sm:tracking-[0.18em]">TRANS-MAP</span>
           <span className="serif hidden text-xs italic text-muted lg:inline">{t.meta.tagline}</span>
         </Link>
-        <div className="mx-auto w-full max-w-xl">
+        <div className="mx-auto min-w-0 max-w-xl flex-1">
           <SearchBox value={query} onChange={setQuery} onPick={(id) => selectEvent(id, { focus: true })} index={searchIndex} events={atlas} />
         </div>
         <nav aria-label="principale" className="hidden items-center gap-1 md:flex">
@@ -352,7 +352,7 @@ export function AtlasApp({ atlas, relations, tags, initial }: { atlas: AtlasEven
           <aside
             className={cx(
               "z-30 flex flex-col border-line bg-surface",
-              "fixed inset-x-0 bottom-0 max-h-[78dvh] rounded-t-xl border-t shadow-2xl",
+              "fixed inset-x-0 bottom-14 max-h-[72dvh] rounded-t-xl border-t shadow-2xl",
               "md:static md:max-h-none md:rounded-none md:border-l md:border-t-0 md:shadow-none",
               panel === "compare" ? "md:w-[min(760px,58vw)]" : "md:w-[420px] lg:w-[460px]",
             )}
@@ -374,12 +374,12 @@ export function AtlasApp({ atlas, relations, tags, initial }: { atlas: AtlasEven
       <footer className="z-20 hidden shrink-0 border-t border-line bg-surface px-4 py-2 md:block">{timeline}</footer>
 
       {/* ——— Mobile: bottom bar and sheets ——— */}
-      <nav aria-label="mobile" className="z-40 flex shrink-0 items-stretch justify-around border-t border-line bg-surface md:hidden" data-testid="mobile-nav">
+      <nav aria-label="mobile" className="z-40 flex h-14 shrink-0 items-stretch justify-around border-t border-line bg-surface md:hidden" data-testid="mobile-nav">
         {(
           [
             ["filters", "filter", t.toolbar.filters],
             ["list", "list", `${t.toolbar.list} ${filtered.events.length}`],
-            ["timeline", "clock", t.toolbar.timeline],
+            ["timeline", "clock", t.toolbar.timelineShort],
           ] as const
         ).map(([id, icon, label]) => (
           <button
@@ -399,7 +399,7 @@ export function AtlasApp({ atlas, relations, tags, initial }: { atlas: AtlasEven
         ))}
         <button type="button" onClick={() => openPanel("horizon")} aria-pressed={panel === "horizon"} className={cx("flex flex-1 flex-col items-center gap-0.5 py-1.5 text-[11px]", panel === "horizon" ? "text-accent-ink" : "text-ink-2")} data-testid="mobile-horizon">
           <Icon name="compass" size={18} />
-          {t.toolbar.horizon.split(" ")[0]}
+          {t.toolbar.horizonShort}
         </button>
         <button type="button" onClick={() => openPanel("compare")} aria-pressed={panel === "compare"} className={cx("flex flex-1 flex-col items-center gap-0.5 py-1.5 text-[11px]", panel === "compare" ? "text-accent-ink" : "text-ink-2")} data-testid="mobile-compare">
           <Icon name="compare" size={18} />
@@ -407,7 +407,7 @@ export function AtlasApp({ atlas, relations, tags, initial }: { atlas: AtlasEven
         </button>
       </nav>
       {mobileSheet && (
-        <div className="fixed inset-x-0 bottom-[52px] z-40 max-h-[70dvh] overflow-y-auto rounded-t-xl border-t border-line bg-surface p-3 shadow-2xl md:hidden" role="dialog" aria-label={mobileSheet} data-testid={`sheet-${mobileSheet}`}>
+        <div className="fixed inset-x-0 bottom-14 z-40 max-h-[70dvh] overflow-y-auto rounded-t-xl border-t border-line bg-surface p-3 shadow-2xl md:hidden" role="dialog" aria-label={mobileSheet} data-testid={`sheet-${mobileSheet}`}>
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-semibold text-ink">{mobileSheet === "filters" ? t.toolbar.filters : mobileSheet === "list" ? t.list.title : t.toolbar.timeline}</span>
             <button type="button" onClick={() => setMobileSheet(null)} aria-label={t.toolbar.close} className="rounded p-1 text-ink-2">

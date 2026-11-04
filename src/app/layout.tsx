@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { getLocale } from "@/i18n/server";
@@ -30,10 +31,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = await getLocale();
   return (
     <html lang={locale} data-theme="dark" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body>
+        <Script id="tm-theme" strategy="beforeInteractive">
+          {themeScript}
+        </Script>
         <I18nProvider locale={locale}>{children}</I18nProvider>
       </body>
     </html>

@@ -11,11 +11,18 @@ export function resolveDbPath(): string {
   return process.env.TRANSMAP_DB_PATH ?? path.join(process.cwd(), "data", "trans-map.db");
 }
 
-export function openDatabase(file: string = resolveDbPath()): { db: TransMapDb; sqlite: Database.Database } {
-  if (file !== ":memory:") fs.mkdirSync(path.dirname(file), { recursive: true });
-  const sqlite = new Database(file);
-  sqlite.pragma("foreign_keys = ON");
-  if (file !== ":memory:") sqlite.pragma("journal_mode = WAL");
+export function openDatabase(
+  file: string = resolveDbPath(),
+  options: { readonly?: boolean } = {},
+): { db: TransMapDb; sqlite: Database.Database } {
+  if (file !== ":memory:" && !options.readonly) fs.mkdirSync(path.dirname(file), { recursive: true });
+  const sqlite = new Database(file, options.readonly ? { readonly: true, fileMustExist: true } : {});
+  if (!options.readonly) {
+    sqlite.pragma("foreign_keys = ON");
+    // Rollback journal (not WAL): reads never touch auxiliary files, so file
+    // watchers and read-only deployments are not disturbed.
+    if (file !== ":memory:") sqlite.pragma("journal_mode = DELETE");
+  }
   return { db: drizzle(sqlite, { schema }), sqlite };
 }
 

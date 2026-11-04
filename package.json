@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "TRANS-MAP — The Atlas of Human Significance. Atlante interattivo per esplorare eventi storici, scientifici e culturali e confrontarne le proporzioni.",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -48,6 +48,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm run data:validate && npm run test"
+    "check": "npm run typecheck && npm run data:validate && npm run test",
+    "db:reset": "node -e \"require('fs').rmSync('data/trans-map.db',{force:true})\" && npm run db:setup"
   }
 }
