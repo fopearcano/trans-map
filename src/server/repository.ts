@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import { buildAtlasIndex, summarizeRelations, type AtlasEvent, type RelationSummary } from "@/domain/atlas";
 import type { Dataset } from "@/domain/dataset";
-import type { CuratedComparison, EventRecord, Place, Relation, Source } from "@/domain/schemas";
+import type { CuratedComparison, EventRecord, Place, Relation, Source, Tag } from "@/domain/schemas";
 import { openDatabase, resolveDbPath } from "./db/client";
 import { loadDataset } from "./db/read";
 
@@ -29,6 +29,7 @@ export interface EventDetail {
   sources: Source[];
   related: RelatedEventRef[];
   comparisons: CuratedComparison[];
+  tags: Tag[];
 }
 
 export interface EventRepository {
@@ -160,6 +161,7 @@ export class SqliteEventRepository implements EventRepository {
       sources: [...cited].map((x) => s.sourcesById.get(x)).filter((x): x is Source => !!x),
       related,
       comparisons: s.dataset.comparisons.filter((c) => c.eventIds.includes(id)),
+      tags: s.dataset.tags.filter((tag) => event.tags.includes(tag.id)),
     };
   }
 }
